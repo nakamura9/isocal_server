@@ -1,0 +1,26 @@
+<!Doctype html>
+<html>
+	<head>
+		{% block title %}{% endblock %}
+		<meta charset = "UTF-8" >
+		<link rel="stylesheet" href="css/app.css" >
+		<link rel="stylesheet" href="css/forms.css" >
+		<script  src="scripts/jquery-2.2.2.js"></script>
+	</head>
+	<body>
+		<div id="head">
+		<h1>ConsolTech Calibration </h1>
+		</div>
+		<div id="aside">
+			<ul>	
+				<li class="base"><a href="summary">Certificate Summary</a></li>
+            </ul>
+		</div>
+	<div id="content">
+		{% block content %} {% endblock %}
+	</div>
+    <div id="right">
+        {% block right %} {% endblock %}
+    </div>
+	</body>
+</html>
