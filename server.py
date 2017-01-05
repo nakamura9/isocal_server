@@ -271,6 +271,7 @@ class Mobile():
         try:
             print(self.balance)
             record = data.balance(_id= self.balance["id"],
+                                        date = datetime
                                           customer = self.balance["customer"],
                                           end_time = self.balance["end_time"],
                                           start_time = self.balance["start_time"],
@@ -369,7 +370,8 @@ class Mobile():
                                   customer=self.autoclave["customer"],
                                   start_time=self.autoclave["start_time"],
                                   end_time=self.autoclave["end_time"],
-                                  date=datetime.date.today(),
+                                  date=datetime.date.today().strftime("%d/%m/%Y"),
+                                  due= self.autoclave["due"],
                                   serial=self.autoclave["serial"],
                                   immersion_depth=self.autoclave["immersion_depth"],
                                   manufacturer=self.autoclave["manufacturer"],
