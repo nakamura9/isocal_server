@@ -21,7 +21,7 @@
 		</style>
 	</head>
 	<body>
-		<center><p>{{certificate_number}}</p></center>
+		<center><p>20170107122938CK</p></center>
         
         
         
@@ -41,25 +41,25 @@
         <h2 style="color: red;
 					text-align: center;"> CALIBRATION CERTIFICATE</h2>
 
-<pre><b>Date of Calibration:  {{date}}
+<pre><b>Date of Calibration:  06/01/2017
 
-Date of Next Calibration: {{due}}
+Date of Next Calibration: 05/07/17
 		
-Calibrated for     :  {{customer}}
+Calibrated for     :  delta
 		
-Calibration of     :  {{type}}
+Calibration of     :  pressure guage
 
-Manufacturer       :  {{manufacturer}}
+Manufacturer       :  and
 
-Serial Number      :  {{serial}}
+Serial Number      :  74884
 
-Range              :  {{range}}
+Range              :  0-200
 			
-Resolution         :  {{resolution}}
+Resolution         :  0.0001
 			
-Calibrated at      :  {{location}}
+Calibrated at      :  delta
 
-Immersion depth    :  {{immersion}}%
+Immersion depth    :  %
 
 
 </b></pre>
@@ -68,7 +68,7 @@ Immersion depth    :  {{immersion}}%
 		<br />
 		<center><table>
 			<tr><td>Calibrated by</td>
-				<td>{{by}}</td>
+				<td>caleb kandoro</td>
 				<td>Sign</td>
 			</tr>
 			<tr><td></td>
@@ -101,25 +101,68 @@ Immersion depth    :  {{immersion}}%
 		
 		</pre>
 	<h3><b>1    Standards used:</b></h3>
-		{% block standards %}
-		{% endblock %}
-	<h3>2	Procedure used: {{procedure}} </h3>
+		
+	<table>
+		<tr>
+			<td>Laboratory Standards and<br />
+			Equipment Used</td>
+			<td>Serial Number</td>
+			<td>Certificate Number</td>
+		</tr>
+		<tr>
+			<td> Dead Weight Tester</td>
+			<td>13233</td>
+			<td>P/233/02</td>
+		</tr>
+	<table>
+	
+	
+
+	<h3>2	Procedure used:  </h3>
 		
 	<h3>3	Calibration Conditions:</h3>
 	
-	<p>Temperature: {{temperature}} Â± 1ÂºC</p>
-	<p>Humidity   :  {{humidity}} Â± 10% RH</p>
+	<p>Temperature: 123 ± 1ºC</p>
+	<p>Humidity   :  123 ± 10% RH</p>
 	
 	
-	<h3>4	Units used : {{units}}</h3>
+	<h3>4	Units used : bar</h3>
 	
 	<h3>5	Results:</h3>
-	{% block results %}
-	{% endblock %}
+	
+
+	<table>
+		<tr>
+			<td>Total weight(g)</td>
+			<td>Calculated pressure</td>
+			<td>Actual Reading</td>
+			<td>Difference</td>
+		</tr>
+		<tr><td>2398</td>
+<td>4.03</td>
+<td>4.1</td>
+<td>0.096</td></tr>
+<tr><td>2398</td>
+<td>4.03</td>
+<td>3.8</td>
+<td>0.204</td></tr>
+
+	</table>
+    
+    
+	<p><b>The uncertainty of the pressure measurement was estimated to be ± 
+	0.2257 bar.(95% confidence level)</b>
+	</p>
+	
+	
+
 	
 	<h3>6	Traceability:</h3>
-	{% block traceability %}
-	{% endblock %}
+	
+		<p>The standard pressure calibrator is traceable to Superb Instrumentation 
+		through calibration certificate numbers P/807/02 AND 0795105</p>
+		
+	
 	
 	<h3>7	Remarks:</h3>
 	
@@ -132,7 +175,7 @@ Immersion depth    :  {{immersion}}%
 	multiplied by a coverage factor of k=2, which unless specifically stated otherwise
 	provides a level of confidence of approximately 95%</p>
     
-    <p>{{comments}}</p>
+    <p>Comments...</p>
     </div>
 	</body>
 </html>

@@ -21,7 +21,7 @@
 		</style>
 	</head>
 	<body>
-		<center><p>{{certificate_number}}</p></center>
+		<center><p>20170107131022CK</p></center>
         
         
         
@@ -41,25 +41,25 @@
         <h2 style="color: red;
 					text-align: center;"> CALIBRATION CERTIFICATE</h2>
 
-<pre><b>Date of Calibration:  {{date}}
+<pre><b>Date of Calibration:  22/02/2016
 
-Date of Next Calibration: {{due}}
+Date of Next Calibration: 22/08/2016
 		
-Calibrated for     :  {{customer}}
+Calibrated for     :  delta
 		
-Calibration of     :  {{type}}
+Calibration of     :  AUTOCLAVE
 
-Manufacturer       :  {{manufacturer}}
+Manufacturer       :  auto
 
-Serial Number      :  {{serial}}
+Serial Number      :  72-374
 
-Range              :  {{range}}
+Range              :  0-10(0-100)
 			
-Resolution         :  {{resolution}}
+Resolution         :  0.1(0.1)
 			
-Calibrated at      :  {{location}}
+Calibrated at      :  delta
 
-Immersion depth    :  {{immersion}}%
+Immersion depth    :  100%
 
 
 </b></pre>
@@ -68,7 +68,7 @@ Immersion depth    :  {{immersion}}%
 		<br />
 		<center><table>
 			<tr><td>Calibrated by</td>
-				<td>{{by}}</td>
+				<td>caleb kandoro</td>
 				<td>Sign</td>
 			</tr>
 			<tr><td></td>
@@ -101,25 +101,96 @@ Immersion depth    :  {{immersion}}%
 		
 		</pre>
 	<h3><b>1    Standards used:</b></h3>
-		{% block standards %}
-		{% endblock %}
-	<h3>2	Procedure used: {{procedure}} </h3>
+		
+
+<table>
+		<tr>
+			<td>Laboratory Standards and<br />
+			Equipment Used</td>
+			<td>Serial Number</td>
+			<td>Certificate Number</td>
+		</tr>
+		<tr>
+			<td> Dead Weight Tester</td>
+			<td>13233</td>
+			<td>P/233/02</td>
+		</tr>
+        <tr>
+			<td>ECOSCAN TEMP6</td>
+			<td>458909</td>
+			<td>201506011022DD</td>
+		</tr>
+	<table>
+	
+	
+
+		
+
+	<h3>2	Procedure used:  </h3>
 		
 	<h3>3	Calibration Conditions:</h3>
 	
-	<p>Temperature: {{temperature}} Â± 1ÂºC</p>
-	<p>Humidity   :  {{humidity}} Â± 10% RH</p>
+	<p>Temperature: 20 ± 1ºC</p>
+	<p>Humidity   :  20 ± 10% RH</p>
 	
 	
-	<h3>4	Units used : {{units}}</h3>
+	<h3>4	Units used : bar(celsius)</h3>
 	
 	<h3>5	Results:</h3>
-	{% block results %}
-	{% endblock %}
+	
+
+<h3>Pressure</h3>
+	<table>
+		<tr>
+			<td>Total weight(g)</td>
+			<td>Calculated pressure</td>
+			<td>Actual Reading</td>
+			<td>Correction</td>
+		</tr>
+		<tr><td>2398</td>
+<td>4.03</td>
+<td>4</td>
+<td>0.03000000000000025</td></tr>
+<tr><td>2398</td>
+<td>4.03</td>
+<td>4</td>
+<td>0.03000000000000025</td></tr>
+
+	</table>
+	<p><b>The uncertainty of the pressure measurement was estimated to be ± 
+	0.1 bar(celsius).(95% confidence level)</b>
+	</p>
+	
+<h3>Temperature</h3>
+
+<table>
+		<tr>
+			<td>Actual temperature</td>
+			<td>Indicated reading</td>
+			<td>Correction</td>
+		</tr>
+		<tr><td>21</td>
+<td>20</td>
+<td>1.0</td></tr>
+<tr><td>21</td>
+<td>20</td>
+<td>1.0</td></tr>
+
+	</table>
+	<p><b>The uncertainty of the measurements was estimated to be ± 
+	1.4 ºC.(95% confidence level)</b>
+	
+
 	
 	<h3>6	Traceability:</h3>
-	{% block traceability %}
-	{% endblock %}
+	
+<p><b>For Pressure:</b>The standard pressure calibrator is traceable to Superb Instrumentation 
+		through calibration certificate numbers P/807/02 AND 0795105</p>
+		
+<p><b>For Temperature:</b>The reference thermometer used is traceable to REPCAL 
+		through calibration certificate number 146-03041216.</p>
+		
+
 	
 	<h3>7	Remarks:</h3>
 	
@@ -132,7 +203,7 @@ Immersion depth    :  {{immersion}}%
 	multiplied by a coverage factor of k=2, which unless specifically stated otherwise
 	provides a level of confidence of approximately 95%</p>
     
-    <p>{{comments}}</p>
+    <p></p>
     </div>
 	</body>
 </html>

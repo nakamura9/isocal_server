@@ -7,18 +7,16 @@
 			<td class="no_b">Serial Number</td>
 			<td class="no_b">Certificate Number</td>
 		</tr>
-		<tr class="no_b">
-			<td class="no_b">Standard set of Mass Pieces</td>
-			<td class="no_b">OHAUS</td>
-			<td class="no_b">ISOOHA01</td>
-		</tr>
+		
 	<table>
 	
 {% endblock %}
 {% block results %}
 		{{fields}}
+
+
 	<p><b>The uncertainty of the measurement was estimated to be + 
-	{{uncertainty}}.(95% confidence level)</b>
+	{{uncertainty}}{{units}}.(95% confidence level)</b>
 	</p>
 	
 {% endblock %}

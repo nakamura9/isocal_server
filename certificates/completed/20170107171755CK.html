@@ -21,7 +21,7 @@
 		</style>
 	</head>
 	<body>
-		<center><p>{{certificate_number}}</p></center>
+		<center><p>20170107171755CK</p></center>
         
         
         
@@ -41,25 +41,25 @@
         <h2 style="color: red;
 					text-align: center;"> CALIBRATION CERTIFICATE</h2>
 
-<pre><b>Date of Calibration:  {{date}}
+<pre><b>Date of Calibration:  07/01/2017
 
-Date of Next Calibration: {{due}}
+Date of Next Calibration: 06/07/17
 		
-Calibrated for     :  {{customer}}
+Calibrated for     :  delta
 		
-Calibration of     :  {{type}}
+Calibration of     :  multimeter
 
-Manufacturer       :  {{manufacturer}}
+Manufacturer       :  auto
 
-Serial Number      :  {{serial}}
+Serial Number      :  mm123
 
-Range              :  {{range}}
+Range              :  0-10
 			
-Resolution         :  {{resolution}}
+Resolution         :  0.1
 			
-Calibrated at      :  {{location}}
+Calibrated at      :  delta
 
-Immersion depth    :  {{immersion}}%
+Immersion depth    :  %
 
 
 </b></pre>
@@ -68,7 +68,7 @@ Immersion depth    :  {{immersion}}%
 		<br />
 		<center><table>
 			<tr><td>Calibrated by</td>
-				<td>{{by}}</td>
+				<td>caleb kandoro</td>
 				<td>Sign</td>
 			</tr>
 			<tr><td></td>
@@ -101,25 +101,60 @@ Immersion depth    :  {{immersion}}%
 		
 		</pre>
 	<h3><b>1    Standards used:</b></h3>
-		{% block standards %}
-		{% endblock %}
-	<h3>2	Procedure used: {{procedure}} </h3>
+		
+<table>
+    <tr>
+        <td>Laboratory Standards and Equipment<br /> and Equipment Used</td>
+        <td>Serial No.</td>
+        <td>Certificate No.</td>
+    </tr>
+    <tr>
+        <td>Fluke 5100B</td>
+        <td>4811139</td>
+        <td>26807</td>
+    </tr>
+</table>
+
+	<h3>2	Procedure used:  </h3>
 		
 	<h3>3	Calibration Conditions:</h3>
 	
-	<p>Temperature: {{temperature}} Â± 1ÂºC</p>
-	<p>Humidity   :  {{humidity}} Â± 10% RH</p>
+	<p>Temperature: 123 ± 1ºC</p>
+	<p>Humidity   :  123 ± 10% RH</p>
 	
 	
-	<h3>4	Units used : {{units}}</h3>
+	<h3>4	Units used : amp</h3>
 	
 	<h3>5	Results:</h3>
-	{% block results %}
-	{% endblock %}
+	
+<table>
+    <tr>
+        <td>Input</td>
+        <td>Indicated Reading</td>
+        <td>Correction</td>
+        <td>Uncertainty</td>
+    </tr>
+    <tr><td>5.0</td>
+<td>5.0</td>
+<td>0.0</td>
+<td>0.0</td></tr>
+
+<tr><td>8.0</td>
+<td>8.0</td>
+<td>0.0</td>
+<td>0.0</td></tr>
+
+    </table>
+    <p><b>The uncertainty of the measurements was estimated to be ± 
+    0.1 amp.(95% confidence level)</b>
+	</p>
+
 	
 	<h3>6	Traceability:</h3>
-	{% block traceability %}
-	{% endblock %}
+	
+<p><b>Traceability</b>: The Fluke calibratir us traceable to REPCAL Services cc, South Africa
+through certificate number 146-03041216</p>
+
 	
 	<h3>7	Remarks:</h3>
 	
@@ -132,7 +167,7 @@ Immersion depth    :  {{immersion}}%
 	multiplied by a coverage factor of k=2, which unless specifically stated otherwise
 	provides a level of confidence of approximately 95%</p>
     
-    <p>{{comments}}</p>
+    <p>Comments...</p>
     </div>
 	</body>
 </html>

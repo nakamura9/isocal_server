@@ -136,102 +136,155 @@ class CertificateServer():
     
     @cherrypy.expose
     def generate_certificate(self, id, _type):
-        form=self.templates.get_template("add.html")
-        return form.render(id=id, _type=_type)
-        
+        if session_check():
+            form=self.templates.get_template("add.html")
+            return form.render(id=id, _type=_type)
+        else:
+            raise cherrypy.HTTPRedirect("index")
     @cherrypy.expose
-    def create_certificate(self, temp, humidity, id, _type):
-        initials = get_initials(cherrypy.session["user"])
-        username = cherrypy.session["user_name"]
-        if not initials:
-            return "sesion variables not correctly initialized"     
-        cert = self._create_certificate(temp, humidity, id, _type, initials, username)
-        if cert:
-            return self.summary()
-        else: return "an error occurred"
+    def create_certificate(self, temp, humidity, id, _type,batch="off"):
+        print("batch", batch)
+        if session_check():
+            initials = get_initials(cherrypy.session["user"])
+            cherrypy.session["warnings"] =[]
+            cherrypy.session["errors"] = []
+            username = cherrypy.session["user_name"]
+            if batch == "on":
+                if "common" not in cherrypy.session:
+                    if temp == "" or humidity == "":
+                        return """<h1>Oops!</h1><p>You cannot check the batch option before providing initial values</p>
+                                    <a href='summary'>Return to summary</a> """
+                    else: 
+                        cherrypy.session["common"] = {"temp": temp, "humidity": humidity}
+                else:
+                    temp, humidity = cherrypy.session["common"]["temp"], cherrypy.session["common"]["humidity"]
             
-    @cherrypy.expose 
+            if not initials:
+                return """Sesion variables not correctly initialized. Login again and try
+                            to generate another certificate."""     
+            try:
+                cert = self._create_certificate(temp, humidity, id, _type, initials, username)
+                outcome = "sucessfully"
+            except Exception as e: 
+                outcome = "unsucessfully"
+                cherrypy.session["errors"].append("at calibration: {}".format(e))
+
+            finally:
+                review = self.templates.get_template("review.html") 
+                return review.render(outcome=outcome,
+                                            warnings= cherrypy.session["warnings"],
+                                            errors= cherrypy.session["errors"])
+        else:
+            raise cherrypy.HTTPRedirect("index")
+
     def _create_certificate(self, temp, humidity, id, _type, initials,
                             username):
-        now = datetime.datetime.now()
-        certificate_number= "{}{}".format(now.strftime("%Y%m%d%H%M%S"),
-                               initials)
-        
-        _types= {"autoclave":certificates.autoclave_certificate,
-                 "volume": certificates.volume_certificate,
-                 "current": certificates.current_certificate,
-                 "conductivity": certificates.conductivity_certificate,
-                 "voltage": certificates.voltage_certificate,
-                 "pressure": pressure_certificate.pressure_certificate,
-                    "temperature": certificates.temperature_certificate,
-                    "ph": certificates.ph_certificate,
-                    "flow": certificates.flow_certificate,
-                    'length': certificates.length_certificate,
-                    "mass": certificates.mass_certificate,
-                    "tds": certificates.tds_certificate,
-                    "balance": balance_certificate.balance_certificate}
-        
-        if _type.lower() == "balance":
-            balance_data= data.session.query(data.balance).get(id)
-            if balance_data:
-                customer = balance_data.customer
-                name= "balance"
-                datasheet_object= datasheets.balance_datasheet(id, initials)
-                datasheet_object.generate_datasheet()
+        if session_check():
+            warnings = []
+            now = datetime.datetime.now()
+            certificate_number= "{}{}".format(now.strftime("%Y%m%d%H%M%S"),
+                                initials)
+            
+            _types= {"autoclave":certificates.autoclave_certificate,
+                    "volume": certificates.volume_certificate,
+                    "current": certificates.current_certificate,
+                    "conductivity": certificates.conductivity_certificate,
+                    "voltage": certificates.voltage_certificate,
+                    "pressure": pressure_certificate.pressure_certificate,
+                        "temperature": certificates.temperature_certificate,
+                        "ph": certificates.ph_certificate,
+                        "flow": certificates.flow_certificate,
+                        'length': certificates.length_certificate,
+                        "mass": certificates.mass_certificate,
+                        "tds": certificates.tds_certificate,
+                        "balance": balance_certificate.balance_certificate}
+            error_string = """there is no {} with the id: {}
+                            check the relavent database table for an 
+                            entry with this id and make sure it is 
+                            correctly filled out.""".format(_type.lower(), id)
+            if _type == "":
+                raise Exception("The type must be supplied as a field in the previous page")
+            elif _type.lower() == "balance":
+                balance_data= data.session.query(data.balance).get(id)
+                if balance_data:
+                    customer = balance_data.customer
+                    name= "balance"
+                    datasheet_object= datasheets.balance_datasheet(id, initials)
+                    if datasheet_object.data:
+                        try:
+                            datasheet_object.generate_datasheet()
+                        except Exception as e:
+                            warnings.append("The datasheet failed to generate due to an error: {}".format(e))
+                    else: warnings.append("The datasheet was unable to retreive data with the given id") 
+                else: 
+                    cherrypy.session["errors"].append(error_string)
+                    raise Exception(error_string)
+                    
+            elif _type.lower() == "autoclave":
+                autoclave_data=data.session.query(data.autoclave).get(id)
+                if autoclave_data:
+                    customer = autoclave_data.customer
+                    name = "autoclave"
+                    datasheet_object= datasheets.autoclave_datasheet(id, initials)
+                    if datasheet_object.data:
+                        try:
+                            datasheet_object.generate_datasheet()
+                        except Exception as e:
+                            warnings.append("The datasheet failed to generate due to an error: {}".format(e))
+                    else: warnings.append("The datasheet was unable to retreive data with the given id") 
+                else: 
+                    cherrypy.session["errors"].append(error_string)
+                    raise Exception(error_string)
+            else:      
+                general_data= data.session.query(data.general).get(id)
+                if general_data:
+                    customer = general_data.customer
+                    name = general_data.name_of_instrument
+                    datasheet_object= datasheets.general_datasheet(id, initials)
+                    if datasheet_object.data:
+                        try:
+                            datasheet_object.generate_datasheet()
+                        except Exception as e:
+                            warnings.append("The datasheet failed to generate due to an error: {}".format(e))
+                    else: warnings.append("The datasheet was unable to retreive data with the given id")
+                else:
+                    cherrypy.session["errors"].append(error_string)                
+                    raise Exception(error_string)
+            #certificate
+            try:
+                cert= _types[_type.lower()](id, initials, username,
+                                        temp, humidity)
+            except KeyError:
+                raise Exception("""The calibarion type provided does not match any 
+                                                stored by the server, please review the type defined by previous page.
+                                                It must fall under one of: \n>{}""".format("\n>".join(_types.keys())))
             else:
-                print("there is no balance with the id: ", id)
-                print("these are available: ", [i._id for i in data.session.query(data.balance).all()])
-            
-        elif _type.lower() == "autoclave":
-            autoclave_data=data.session.query(data.autoclave).get(id)
-            if autoclave_data:
-                customer = autoclave_data.customer
-                datasheet_object= datasheets.autoclave_datasheet(id, initials)
-                datasheet_object.generate_datasheet()
-                name = "autoclave"
-            else:
-                print("there is no autoclave with the id: ", id)
-                #print("these are available: ", data.session.query(data.autoclave).all()._id)
-        else:      
-            general_data= data.session.query(data.general).get(id)
-            if general_data:
-                customer = general_data.customer
-                name = general_data.name_of_instrument
-                datasheet_object= datasheets.general_datasheet(id, initials)
-                datasheet_object.generate_datasheet()
-            else:
-                print("there is no general certificate with the id: ", id)
-                #print("these are available: ", data.session.query(data.autoclave).all()._id)
-                
-        #
-        # Moving to completed 
-        #
-                
-        completed =data.completed(_id = id,
-                                   name_of_instrument=name,
-                                   customer =customer,
-                                   serial = certificate_number
-                                      )
-            
-        cert= _types[_type.lower()](id, initials, username,
-                                    temp, humidity)
-        cert.generate_certificate()
-            
-        try:
-            data.session.add(completed)
-            data.session.delete(data.session.query(data.outstanding).get(id))
-            data.session.commit()
-        except Exception as e:
-            data.session.rollback()
-            print("this happened during commit: ", e)
-            return 0
-        
-        return 1
-            
-    
-    @cherrypy.expose
-    def stop_server(self):
-        stop_server()
+                try:
+                    cert.generate_certificate()
+                except Exception as e:
+                    raise Exception("Generation failed- {}".format(e))
+            #databse entry
+            try:
+                completed =data.completed(_id = id,
+                                    name_of_instrument=name,
+                                    customer =customer,
+                                    serial = certificate_number)
+                data.session.add(completed)
+                data.session.delete(data.session.query(data.outstanding).get(id))
+                data.session.commit()
+            except Exception as e:
+                data.session.rollback()
+                warnings.append("""The server failed to update the database.
+                        The error has to do with the data that lists
+                        the completed certificates and those that remain.
+                        The certificate however has been generated sucessfully.
+                        You may manually delete the relevant entry in the outstanding
+                        table of the database using SQLStudio.""")
+
+            cherrypy.session["warnings"] = warnings
+        else:
+            raise cherrypy.HTTPRedirect("index")
+ 
     
 #
 # this function makes sure only logged in users can access certain pages
@@ -274,6 +327,8 @@ class Mobile():
                                           customer = self.balance["customer"],
                                           end_time = self.balance["end_time"],
                                           start_time = self.balance["start_time"],
+                                          date = datetime.datetime.today().strftime("%d/%m%Y"),
+                                          due = self.balance["due"],
                                           serial = self.balance["sn"],
                                           manufacturer = self.balance["man"],
                                           model = self.balance["model"],
@@ -359,7 +414,7 @@ class Mobile():
         self.autoclave[key] = value
         print(self.autoclave_count)
         self.status = "pending"
-        if self.autoclave_count == 21:
+        if self.autoclave_count == 23:
             self.status = self.add_autoclave()
         return self.status
     
@@ -369,7 +424,8 @@ class Mobile():
                                   customer=self.autoclave["customer"],
                                   start_time=self.autoclave["start_time"],
                                   end_time=self.autoclave["end_time"],
-                                  date=datetime.date.today(),
+                                  date=self.autoclave["date"],
+                                  due = self.autoclave["due"],
                                   serial=self.autoclave["serial"],
                                   immersion_depth=self.autoclave["immersion_depth"],
                                   manufacturer=self.autoclave["manufacturer"],
@@ -380,7 +436,8 @@ class Mobile():
                                   resolution_p=self.autoclave["resolution_p"],
                                   units_temp=self.autoclave["units_temp"],
                                   units_p=self.autoclave["units_p"],
-                                  standards=self.autoclave["standards"],
+                                  standard_temp=self.autoclave["standard_temp"],
+                                  standard_p=self.autoclave["standard_p"],
                                   location=self.autoclave["location"],
                                   comments=self.autoclave["comments"],
                                   temp=self.autoclave["temp"],
@@ -419,13 +476,13 @@ class Mobile():
                                 due = due,
                                 name_of_instrument= instrument,
                                 serial = sn,
-                                manufacturer = man.upper(),
+                                manufacturer = man,
                                 model = model,
                                 range =_range,
                                 immersion_depth= immersion,
                                 standards = standard,
                                 resolution = resolution,
-                                units = units.upper(),
+                                units = units,
                                 location = location,
                                 readings = readings,
                                 corrections= corrections,
@@ -487,8 +544,6 @@ def start_server():
         }
     cherrypy.quickstart(s,"/", conf)
     
-def stop_server():
-    cherrypy.engine.exit()
     
 if __name__ == "__main__":
     start_server()

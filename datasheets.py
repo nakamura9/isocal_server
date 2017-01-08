@@ -12,11 +12,13 @@ class general_datasheet():
     def __init__(self, id, user):
         self.id = id
         self.user = user
-        self.templates = Environment(loader=jinja2.FileSystemLoader(os.path.join(ROOTDIR,"certificates\\templates"))) 
-    
-    def generate_datasheet(self):
         self.get_data()
-        datasheet= self.templates.get_template("general_datasheet.html")
+        self.templates = Environment(loader=jinja2.FileSystemLoader(os.path.join(ROOTDIR,"certificates\\templates"))) 
+        if data.session.query(data.outstanding).get(self.data._id)._type == "pressure":
+            self.datasheet = self.templates.get_template("pressure_datasheet.html")
+        else:
+            self.datasheet= self.templates.get_template("general_datasheet.html")
+    def generate_datasheet(self):
         try:
             s = time.strftime("%H:%M",time.localtime(float(self.data.start_time)))
             e = time.strftime("%H:%M",time.localtime(float(self.data.end_time)))
@@ -28,7 +30,7 @@ class general_datasheet():
         except:
             fil=open(os.path.join(ROOTDIR, "certificates\\datasheets\\{}.html".format(self.data.name_of_instrument)), "w")
         
-        fil.write(datasheet.render(customer=self.data.customer,
+        fil.write(self.datasheet.render(customer=self.data.customer,
                                    number= datetime.datetime.now().strftime("%y%m%d%H%M%S") + self.user,
                                    address=self.data.location,
                                    date=self.data.date,
@@ -65,17 +67,18 @@ class general_datasheet():
         result += "</tr>"
         return result
 
+
 class autoclave_datasheet():
     def __init__(self, id, initials):
         self.id = id
         self.user = initials
+        self.get_data()
         self.templates = Environment(loader=jinja2.FileSystemLoader(os.path.join(ROOTDIR,"certificates\\templates"))) 
     
     def get_data(self):
         self.data = data.session.query(data.autoclave).get(self.id)
     
     def generate_datasheet(self):
-        self.get_data()
         datasheet= self.templates.get_template("general_datasheet.html")
         try:
             s = time.strftime("%H:%M",time.localtime(float(self.data.start_time)))
@@ -96,7 +99,7 @@ class autoclave_datasheet():
                                    user=self.user,
                                    name="Autoclave",
                                    model=self.data.model,
-                                   standards=self.data.standards,
+                                   standards= "{}({})".format(self.data.standard_p,self.data.standard_temp),
                                    serial=self.data.serial,
                                    range="({}){}".format(self.data.range_p, self.data.range_temp),
                                    immersion=self.data.immersion_depth,
