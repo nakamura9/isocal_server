@@ -109,6 +109,7 @@ class balance(BASE):
     warm_up_nominal= sqa.Column(sqa.String(64)) # single value
     nominal_mass = sqa.Column(sqa.String(172)) # list
     settling_time = sqa.Column(sqa.String(128)) #list
+    off_center = sqa.Column(sqa.String(128))
     off_center_mass = sqa.Column(sqa.String(64)) # single value
 
 class balance_before_calibration(BASE):
@@ -138,15 +139,6 @@ class balance_repeatability(BASE):
     _id = sqa.Column(sqa.String(32),  primary_key = True)
     half_reading= sqa.Column(sqa.String(128))
     full_reading= sqa.Column(sqa.String(128))
-    
-class balance_off_center(BASE):
-    __tablename__="off_center"
-    _id = sqa.Column(sqa.String(32), primary_key = True)
-    a= sqa.Column(sqa.String(18))
-    b= sqa.Column(sqa.String(18))
-    c= sqa.Column(sqa.String(18))
-    d= sqa.Column(sqa.String(18))
-    e= sqa.Column(sqa.String(18))
     
     
 class completed(BASE):

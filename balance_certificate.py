@@ -299,10 +299,14 @@ class balance_certificate():
         table = "<table>{}</table>"
         table_contents = []
         table_contents.append(create_row(["Test Weight", self.data.off_center_mass]))
-        readings = [self.off.a, self.off.b, self.off.c, self.off.d, self.off.e]
-        readings = [float(i) for i in readings]
+        if ":" not in self.data.off_center:
+            raise Exception("The off center readings are not enough to create a calibration."
+                            "Please rectify via the database. at least 5 readings are required")
+        readings = [float(i) for i in self.data.off_center.split(":")]
+
         differences = [abs(float(self.data.off_center_mass) - i ) for i in readings ]
         differences = [round(i, self.round_value) for i in differences]
+
         data = {"Position": ["A", "B", "C", "D", "E",],
                 "Reading": readings, 
                 "Weight Difference": differences}

@@ -341,7 +341,8 @@ class Mobile():
                                           warm_up_nominal = self.balance["warm_up_nominal"],
                                           off_center_mass = self.balance["off_center_mass"],
                                           nominal_mass = self.balance["nominal_mass"],
-                                          settling_time = self.balance["settling_time"]
+                                          settling_time = self.balance["settling_time"],
+                                          off_center = self.balance["off_center"]
                                           )
                     
             bc= data.balance_before_calibration(_id = self.balance["id"],
@@ -363,22 +364,7 @@ class Mobile():
                                                half_reading=self.balance["repeat_half"],
                                                full_reading=self.balance["repeat_full"])
                     
-            try:
-                off = self.balance["off_center"].split(":")
-                oc= data.balance_off_center(_id=self.balance["id"],
-                                            a=off[0],
-                                            b=off[1],
-                                            c=off[2],
-                                            d=off[3],
-                                            e=off[4])
-            except:
-                oc= data.balance_off_center(_id = self.balance["id"],
-                                            a="10",
-                                            b="10",
-                                            c="10",
-                                            d="10",
-                                            e="10")    
-                    
+           
             out = data.outstanding(_id = self.balance["id"],
                                    _type= "Balance",
                                    name_of_instrument= "Balance",
