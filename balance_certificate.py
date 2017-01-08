@@ -7,7 +7,7 @@ import jinja2
 import os
 import math
 from statistics import stdev, mean
-from builtins import round               
+from builtins import round
 from certificates import find_round_value
 DIR = os.path.abspath(os.getcwd())
 
@@ -38,13 +38,12 @@ class balance_certificate():
         self.humidity = humidity
         self.certificate_number(self.initials)
         self.template = "balances.html"
-        
-        
+
     def certificate_number(self, initials):
         now = datetime.datetime.now()
         self.certificate_number= "{}{}".format(now.strftime("%Y%m%d%H%M%S"),
                                self.initials)
-        
+
     def get_data(self):
         self.data = data.session.query(data.balance).get(self.id)
         self.tare = data.session.query(data.balance_tare).get(self.id)
@@ -58,21 +57,21 @@ class balance_certificate():
         if not self.standard:
             raise Exception("The required standard could not be retrieved from the database")
         self.round_value = self.get_round()# used to make sure rounding off is uniform
-    
+
     def get_round(self):
         standard_vals= self.standard.actual_values.split("|")
         return find_round_value(standard_vals[0])
-    
+
     def uncertainty(self):
         """overall uncertainty of the data derived from the 
         uncertainty of the standards, the measurements
         drift, repeatbility """
-        
+
         stds_uncertainty = [float(i) for i in self.standard.uncertainty.split("|")]
         def squareroot_of_sum_of_squares(l):
             squares = [math.pow(i, 2) for i in l]
             return math.sqrt(sum(squares))
-        
+
         standard_u_contrib = squareroot_of_sum_of_squares(stds_uncertainty)
 
         res_contrib =  (float(self.data.resolution) / 2 ) / math.sqrt(3)
@@ -80,12 +79,12 @@ class balance_certificate():
         drift_contrib = abs(self.cold_drift()) / math.sqrt(3)
 
         repeat_contrib = squareroot_of_sum_of_squares(self.deviation)
-        
+
         return round(squareroot_of_sum_of_squares([standard_u_contrib,
                                    res_contrib,
                                    drift_contrib,
                                    repeat_contrib]) * 2, self.round_value)
-    
+
     #group of functions for the results table
     def settling_average(self):
         """used to fill the field of the settling table regarding average time"""
@@ -96,11 +95,11 @@ class balance_certificate():
             return round(mean(settling), 2)
         else:
             raise Exception("the settling times list has too few values, check balance settling time")
-    
+
     def off_max_error(self):
         '''maximum corner errors'''
         return max([self.off.a, self.off.b, self.off.c, self.off.d, self.off.e])    
-        
+
     def cold_drift(self):
         '''the total cold start readings
         average of maximum and minimum values
@@ -110,13 +109,13 @@ class balance_certificate():
             average_over_span = (min(cold_values) + max(cold_values)) / 2
             return round(abs(float(self.data.warm_up_nominal) - average_over_span), self.round_value)
         else: raise Exception("The cold values does not have enough data, check balance warm_up_nominal")
-    #end group    
-    
+    #end group
+
     def nominal_table(self):
         nominal = self.linearity_before.nominal_value.split(":")
         actual =self.linearity_before.actual.split(":")
         lin_up = self.linearity_before.linearity_up.split(":")
-        
+
         differences = []
         if len(nominal) != len(actual) or len(nominal) != len(lin_up):
             raise Exception("The provided data is unbalanced. Check balance before linearity table")
@@ -126,20 +125,20 @@ class balance_certificate():
             differences = [round(i, self.round_value) for i in differences]
             data = {"Nominal Mass": nominal,
                     "Actual Mass": actual,
-                    "Linearity Up": lin_up, 
-                    "Difference": differences} 
+                    "Linearity Up": lin_up,
+                    "Difference": differences}
             return simple_table(data, 
                                 ["Nominal Mass", "Actual Mass", "Linearity Up", "Difference"],
                                 True)
         else: raise Exception("Not enough values for the nominal table." 
                                     " Check balance before linearity for at least 5 values")
-        
+
     def standards_table(self):
         table = "<table>{}</table>"
         table_content = []
         table_content.append(create_row(["Description", "Certificate Number",
                                          "Actual Mass", "Uncertainty"]))
-        
+
 
         nom = self.standard.nominal_values.split("|")
         certificate = self.standard.certificate
@@ -152,11 +151,10 @@ class balance_certificate():
         for i in range(len(nom)):
             table_content.append(create_row([nom[i], certificate,
                                             actual[i], uncertainty[i]]))
-    	
+
         return table.format("".join(table_content))
-			
+
     def cold_start_table(self):
-        
         table = "<table>{}<table>"
         table_content = []
         table_content.append(create_row(["Test Weight(g)",
@@ -169,17 +167,19 @@ class balance_certificate():
                                          self.cold_drift()]))
 
         return table.format("".join(table_content))
-			
+
     def settling_table(self):
         data= {"Reading": ["1st", "2nd", "3rd", "4th", "5th"],
                "Settling Time": self.data.settling_time.split(":")[:5]}#length of data already verified
         return simple_table(data, ["Reading", "Settling Time"], True)
-		
+
     def get_nominals(self):
         nom_list = []
         act_list = []
         if ":" not in self.linearity_after_up:
-            raise Exception("there were not enough linearity readings for this calibration")            lin_list =[float(i) for i in self.linearity_after.linearity_up.split(":")]
+            raise Exception("there were not enough linearity readings for this calibration")
+
+        lin_list =[float(i) for i in self.linearity_after.linearity_up.split(":")]
         std_nom = [float(i) for i in self.standard.nominal_values.split("|")]
         std_act = [float(i) for i in self.standard.actual_values.split("|")]
         #this method is more accurate but unreliable
@@ -211,12 +211,12 @@ class balance_certificate():
                                         "to the one used on the calibration")
     def linearity_table(self):
         nom_list, act_list = self.get_nominals()
-        
-    
+
+
         lin_up_list = [float(i) for i in self.linearity_after.linearity_up.split(":")]
         lin_uup_list = [float(i) for i in self.linearity_after.linearity_uup.split(":")]
         lin_down_list = [float(i) for i in self.linearity_after.linearity_Down.split(":")]
-        if len(lin_up_list) != len(lin_uup_list) or
+        if len(lin_up_list) != len(lin_uup_list) or \
             len(lin_up_list) != len(lin_down_list):
             raise Exception("There are not enough linearity readings")
         # sort values
@@ -225,11 +225,11 @@ class balance_certificate():
         lin_up_list.sort()
         lin_down_list.sort()
         lin_uup_list.sort()
-        
+
         average_list = []
         difference_list = []
         deviation_list = []
-        
+
         for  p in range(len(lin_up_list)):# may have to put act_list
             average_list.append(mean([lin_down_list[p], lin_up_list[p], lin_uup_list[p]]))
             difference_list.append(abs(act_list[p]- average_list[p]))
@@ -247,9 +247,9 @@ class balance_certificate():
         return simple_table(data, ["Nominal Value", "Actual Value", "Linearity Up",
                                    "Linearity Down", "Linearity  Up", "Average Reading",
                                    "Difference", "Standard Deviation"], True)
-        
+
     def repeatability_table(self):
-        if ":" not in self.repeatability.half_reading or 
+        if ":" not in self.repeatability.half_reading or \
             ":" not in self.repeatability.full_reading:
             raise Exception("There are not enough readings for repeatability calibration") 
         half_list =[float(i) for i in self.repeatability.half_reading.split(":")]
