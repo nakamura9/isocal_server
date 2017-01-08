@@ -143,7 +143,6 @@ class CertificateServer():
             raise cherrypy.HTTPRedirect("index")
     @cherrypy.expose
     def create_certificate(self, temp, humidity, id, _type,batch="off"):
-        print("batch", batch)
         if session_check():
             initials = get_initials(cherrypy.session["user"])
             cherrypy.session["warnings"] =[]
