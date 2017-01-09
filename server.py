@@ -372,7 +372,7 @@ class Mobile():
                                    serial = self.balance["sn"]
                                    )
                 
-            data.session.add(oc)
+            
             data.session.add(br)
             data.session.add(tare)
             data.session.add(la)

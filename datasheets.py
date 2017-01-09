@@ -138,7 +138,6 @@ class balance_datasheet():
         self.lin_two = data.session.query(data.balance_linearity_after).get(self.id)
         self.tare = data.session.query(data.balance_tare).get(self.id)
         self.repeat = data.session.query(data.balance_repeatability).get(self.id)
-        self.off = data.session.query(data.balance_off_center).get(self.id)
         self.templates = Environment(loader=jinja2.FileSystemLoader(os.path.join(ROOTDIR,"certificates\\templates")))
         
     def generate_datasheet(self):
@@ -200,9 +199,7 @@ class balance_datasheet():
                 <tr>
                     <td>E</td>
                     <td>{}</td>
-                </tr>""".format(self.off.a, self.off.b,
-                                self.off.c, self.off.d,
-                                self.off.e)
+                </tr>""".format(*self.data.off_center.split(":"))
 
 if __name__ == "__main__":
     d=autoclave_datasheet("31072016123", 'KK')

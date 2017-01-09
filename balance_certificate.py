@@ -49,7 +49,6 @@ class balance_certificate():
         self.tare = data.session.query(data.balance_tare).get(self.id)
         self.linearity_before = data.session.query(data.balance_before_calibration).get(self.id)
         self.linearity_after = data.session.query(data.balance_linearity_after).get(self.id)
-        self.off = data.session.query(data.balance_off_center).get(self.id)
         self.repeatability = data.session.query(data.balance_repeatability).get(self.id)
         self.standard = data.session.query(data.general_standards).get(self.data.standard)
         if not self.data:
@@ -98,7 +97,7 @@ class balance_certificate():
 
     def off_max_error(self):
         '''maximum corner errors'''
-        return max([self.off.a, self.off.b, self.off.c, self.off.d, self.off.e])    
+        return max([float(i) for i in self.data.off_center.split(":")])    
 
     def cold_drift(self):
         '''the total cold start readings
@@ -176,7 +175,7 @@ class balance_certificate():
     def get_nominals(self):
         nom_list = []
         act_list = []
-        if ":" not in self.linearity_after_up:
+        if ":" not in self.linearity_after.linearity_up:
             raise Exception("there were not enough linearity readings for this calibration")
 
         lin_list =[float(i) for i in self.linearity_after.linearity_up.split(":")]
