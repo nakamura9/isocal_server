@@ -220,7 +220,6 @@ class autoclave_certificate(certificate):
         elif ":"in temp_table:
             for row in rows:
                 cells = row.split(":")
-                print(len9cells)
                 if len(cells) == 2:
                     self.temp_indicated.append(float(cells[1]))
                     self.temp_actual.append(float(cells[0]))

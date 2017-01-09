@@ -79,7 +79,7 @@ class autoclave_datasheet():
         self.data = data.session.query(data.autoclave).get(self.id)
     
     def generate_datasheet(self):
-        datasheet= self.templates.get_template("general_datasheet.html")
+        datasheet= self.templates.get_template("autoclave_datasheet.html")
         try:
             s = time.strftime("%H:%M",time.localtime(float(self.data.start_time)))
             e = time.strftime("%H:%M",time.localtime(float(self.data.end_time)))
@@ -113,7 +113,7 @@ class autoclave_datasheet():
         fil.close()
     
     def generate_table(self):
-        result = ["<tr><td>Pressure:</td></tr>"]
+        result = []
         def create_rows(data):
             rows = data.split(";")
             res= []
@@ -121,12 +121,13 @@ class autoclave_datasheet():
                 i = row.split(":")
                 res.append(create_row(i))
             return res
-        result.append(create_rows(self.data.pressure))
-        result.append("<tr><td>Temperature:</td></tr>")
+        result.extend(create_rows(self.data.pressure))
+        result.append("""<tr><td>Temperature:</td><td></td><td></td></tr>
+                        <tr><td>Input</td><td>Output</td></tr>""")
         
-        result.append(create_rows(self.data.temp))
+        result.extend(create_rows(self.data.temp))
         
-        return result
+        return "".join(result)
 
 class balance_datasheet():
     def __init__(self, id, user):
